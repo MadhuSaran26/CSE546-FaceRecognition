@@ -67,7 +67,6 @@ RUN chmod 777 /entry.sh
 # Copy other needed files
 COPY utils ${FUNCTION_DIR}
 COPY .env ${FUNCTION_DIR}
-COPY config.py ${FUNCTION_DIR}
 COPY encoding ${FUNCTION_DIR}
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
