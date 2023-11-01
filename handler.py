@@ -12,6 +12,8 @@ INPUT_FRAME_STORAGE_DIR = os.getenv("INPUT_FRAME_STORAGE_DIR")
 ENCODING_PATH = os.getenv("ENCODING_PATH")
 
 def extract_frames(videoPath):
+	if not os.path.exists(INPUT_FRAME_STORAGE_DIR):
+		os.makedirs(INPUT_FRAME_STORAGE_DIR)
 	os.system("ffmpeg -i " + str(videoPath) + " -r 1 " + str(INPUT_FRAME_STORAGE_DIR) + "image-%3d.jpeg")
 
 # Function to read the 'encoding' file
@@ -42,12 +44,15 @@ def face_recognition_handler(event, context):
 	eventJson = json.loads(event)
 	objectKey = eventJson['Records'][0]['s3']['object']['key']
 	videoPath = s3Util.downloadVideoFromS3ToLocal(objectKey)
+	videoName = os.path.basename(videoPath)
 	extract_frames(videoPath)
 	encodingData = open_encoding(ENCODING_PATH)
 	frames = os.listdir(INPUT_FRAME_STORAGE_DIR)
+	resultName = ''
 	for frame in frames:
 		faceRecognized, resultName = compare_image_with_embeddings(os.path.join(INPUT_FRAME_STORAGE_DIR, frame), encodingData)
 		if faceRecognized:
 			break
-		dynamodbUtil.query_table(resultName) #TODO: query the dynamo db and write a csv in output bucket
-	context.done(None, "Function executed successfully")
+	s3Util.addResultObjectToS3(videoName, resultName)
+	#dynamodbUtil.query_table(resultName) #TODO: query the dynamo db and write a csv in output bucket
+	#context.done(None, "Function executed successfully")

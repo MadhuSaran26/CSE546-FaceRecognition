@@ -1,5 +1,7 @@
 import boto3
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 S3_SERVICE = os.getenv("S3_SERVICE")
 INPUT_BUCKET_NAME = os.getenv("INPUT_S3_BUCKET_NAME")
@@ -29,6 +31,8 @@ def addVideoToS3ForAPI(fileToUploadPath, bucket, fileNameInS3, userIp): #TODO: N
     return "{}{}".format(INPUT_S3_FILE_LOCATION, fileNameInS3)
 
 def downloadVideoFromS3ToLocal(key):
+    if not os.path.exists(INPUT_LOCAL_STORAGE_DIR):
+        os.makedirs(INPUT_LOCAL_STORAGE_DIR)
     try:
         response = s3Client.get_object_tagging(
             Bucket=INPUT_BUCKET_NAME,
@@ -52,4 +56,20 @@ def downloadVideoFromS3ToLocal(key):
     return "{}{}".format(localPath, key)
 
 def addResultObjectToS3(imageName, imageResult): #TODO: Need to edit this to store the output in .csv file format
-    pass
+    try:
+        keyList = imageName.split(":")
+        s3Client.put_object(
+            Bucket=OUTPUT_BUCKET_NAME,
+            Key=keyList[0],
+            Body=imageResult.encode('utf-8'),
+            ContentType='text/plain'
+        )
+        s3Client.put_object_tagging(
+            Bucket=OUTPUT_BUCKET_NAME,
+            Key=keyList[0],
+            Tagging={'TagSet': [{'Key': 'UserIP', 'Value': keyList[1]}]}
+        )
+    except Exception as exception:
+        print("Exception in uploading result from App Instance", exception)
+        return exception
+    return "{}{}".format(OUTPUT_S3_FILE_LOCATION, keyList[0])
