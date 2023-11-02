@@ -1,6 +1,6 @@
 import os
-from utils import s3 as s3Util
-from utils import dynamodb as dynamodbUtil
+import s3 as s3Util
+import dynamodb as dynamodbUtil
 import face_recognition
 import pickle
 import json

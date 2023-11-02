@@ -65,7 +65,8 @@ COPY handler.py ${FUNCTION_DIR}
 RUN chmod 777 /entry.sh
 
 # Copy other needed files
-COPY utils ${FUNCTION_DIR}
+COPY dynamodb.py ${FUNCTION_DIR}
+COPY s3.py ${FUNCTION_DIR}
 COPY .env ${FUNCTION_DIR}
 COPY encoding ${FUNCTION_DIR}
 
