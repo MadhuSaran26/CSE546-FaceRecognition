@@ -34,16 +34,7 @@ def downloadVideoFromS3ToLocal(key):
     if not os.path.exists(INPUT_LOCAL_STORAGE_DIR):
         os.makedirs(INPUT_LOCAL_STORAGE_DIR)
     try:
-        response = s3Client.get_object_tagging(
-            Bucket=INPUT_BUCKET_NAME,
-            Key=key
-        )
-        for tag in response['TagSet']:
-            if tag['Key'] == 'UserIP':
-                userIp = tag['Value']
-            else:
-                userIp = ""
-        fileName = key + ":" + userIp
+        fileName = key
         localPath = os.path.join(INPUT_LOCAL_STORAGE_DIR, fileName)
         s3Client.download_file(
             INPUT_BUCKET_NAME,
@@ -57,19 +48,13 @@ def downloadVideoFromS3ToLocal(key):
 
 def addResultObjectToS3(imageName, imageResult): #TODO: Need to edit this to store the output in .csv file format
     try:
-        keyList = imageName.split(":")
         s3Client.put_object(
             Bucket=OUTPUT_BUCKET_NAME,
-            Key=keyList[0],
+            Key=imageName,
             Body=imageResult.encode('utf-8'),
             ContentType='text/plain'
-        )
-        s3Client.put_object_tagging(
-            Bucket=OUTPUT_BUCKET_NAME,
-            Key=keyList[0],
-            Tagging={'TagSet': [{'Key': 'UserIP', 'Value': keyList[1]}]}
         )
     except Exception as exception:
         print("Exception in uploading result from App Instance", exception)
         return exception
-    return "{}{}".format(OUTPUT_S3_FILE_LOCATION, keyList[0])
+    return "{}{}".format(OUTPUT_S3_FILE_LOCATION, imageName)

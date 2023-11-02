@@ -53,6 +53,7 @@ def face_recognition_handler(event, context):
 		faceRecognized, resultName = compare_image_with_embeddings(os.path.join(INPUT_FRAME_STORAGE_DIR, frame), encodingData)
 		if faceRecognized:
 			break
+	print(videoName, resultName)
 	s3Util.addResultObjectToS3(videoName, resultName)
 	#dynamodbUtil.query_table(resultName) #TODO: query the dynamo db and write a csv in output bucket
-	#context.done(None, "Function executed successfully")
+	context.done(None, "Function executed successfully")
