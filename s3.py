@@ -14,23 +14,6 @@ OUTPUT_FILE_DIRECTORY = os.getenv("OUTPUT_FILE_DIRECTORY")
 
 s3Client = boto3.client(S3_SERVICE)
 
-def addVideoToS3ForAPI(fileToUploadPath, bucket, fileNameInS3, userIp): #TODO: Not sure whether upload_file can be used for videos as well
-    try:
-        s3Client.upload_file(
-            fileToUploadPath,
-            bucket,
-            fileNameInS3
-        )
-        s3Client.put_object_tagging(
-            Bucket=bucket,
-            Key=fileNameInS3,
-            Tagging={'TagSet': [{'Key': 'UserIP', 'Value': userIp}]}
-        )
-    except Exception as exception:
-        print("Exception in uploading file from API", exception)
-        return exception
-    return "{}{}".format(INPUT_S3_FILE_LOCATION, fileNameInS3)
-
 def downloadVideoFromS3ToLocal(key):
     if not os.path.exists(INPUT_LOCAL_STORAGE_DIR):
         os.makedirs(INPUT_LOCAL_STORAGE_DIR)

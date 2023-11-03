@@ -5,6 +5,7 @@ import face_recognition
 import pickle
 import numpy as np
 import csvUtil
+import json
 
 INPUT_BUCKET_NAME = os.getenv("INPUT_S3_BUCKET_NAME")
 INPUT_LOCAL_STORAGE_DIR = os.getenv("INPUT_LOCAL_STORAGE_DIR")
@@ -40,10 +41,10 @@ def compare_image_with_embeddings(framePath, encodingData):
 		faceRecognized = True
 		return faceRecognized, resultName
 
-def face_recognition_handler(event, context):
-	eventJson = json.loads(event)
-	objectKey = eventJson['Records'][0]['s3']['object']['key']
-	videoPath = s3Util.downloadVideoFromS3ToLocal(objectKey)
+def face_recognition_handler(videoPath): #(event, context):
+	#eventJson = json.loads(event)
+	#objectKey = eventJson['Records'][0]['s3']['object']['key']
+	#videoPath = s3Util.downloadVideoFromS3ToLocal(objectKey)
 	videoName = os.path.basename(videoPath)
 	extract_frames(videoPath)
 	encodingData = open_encoding(ENCODING_PATH)
@@ -60,4 +61,7 @@ def face_recognition_handler(event, context):
 		s3Util.addResultObjectToS3(videoName.split('.')[0])
 	else:
 		print("Error getting details from dynamodb for " + resultName)
-	context.done(None, "Function executed successfully")
+	#context.done(None, "Function executed successfully")
+
+if __name__=="__main__":
+	face_recognition_handler('/Users/madhusaran/Documents/GitHub/CSE546-FaceRecognition/test_cases/test_case_1/test_2.mp4')
