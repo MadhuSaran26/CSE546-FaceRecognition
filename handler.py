@@ -15,6 +15,7 @@ ENCODING_PATH = os.getenv("ENCODING_PATH")
 def extract_frames(videoPath):
 	if not os.path.exists(INPUT_FRAME_STORAGE_DIR):
 		os.makedirs(INPUT_FRAME_STORAGE_DIR)
+	print("ffmpeg -i " + str(videoPath) + " -r 1 " + str(INPUT_FRAME_STORAGE_DIR) + "image-%3d.jpeg")
 	os.system("ffmpeg -i " + str(videoPath) + " -r 1 " + str(INPUT_FRAME_STORAGE_DIR) + "image-%3d.jpeg")
 
 # Function to read the 'encoding' file
@@ -41,13 +42,18 @@ def compare_image_with_embeddings(framePath, encodingData):
 		faceRecognized = True
 		return faceRecognized, resultName
 
-def face_recognition_handler(videoPath): #(event, context):
-	#eventJson = json.loads(event)
-	#objectKey = eventJson['Records'][0]['s3']['object']['key']
-	#videoPath = s3Util.downloadVideoFromS3ToLocal(objectKey)
+def face_recognition_handler(event, context):
+	print("Face Recognition Handler is called")
+	eventInput = json.dumps(event)
+	eventJson = json.loads(eventInput)
+	objectKey = eventJson['Records'][0]['s3']['object']['key']
+	videoPath = s3Util.downloadVideoFromS3ToLocal(objectKey)
+	print("Input video file is downloaded")
 	videoName = os.path.basename(videoPath)
 	extract_frames(videoPath)
+	print("Frames are extracted")
 	encodingData = open_encoding(ENCODING_PATH)
+	print("Open the encoding file")
 	frames = os.listdir(INPUT_FRAME_STORAGE_DIR)
 	resultName = ''
 	for frame in frames:
@@ -55,13 +61,14 @@ def face_recognition_handler(videoPath): #(event, context):
 		if faceRecognized:
 			break
 	print(videoName, resultName)
+	print("Recognized the face in the video")
 	resultFromDynamoDb = dynamodbUtil.queryTable(resultName)
+	print("Queried the table")
 	if resultFromDynamoDb:
 		csvUtil.writeResultToCsv(resultFromDynamoDb, videoName.split('.')[0] + '.csv')
 		s3Util.addResultObjectToS3(videoName.split('.')[0])
+		print("Result stored in s3")
 	else:
 		print("Error getting details from dynamodb for " + resultName)
-	#context.done(None, "Function executed successfully")
-
-if __name__=="__main__":
-	face_recognition_handler('/Users/madhusaran/Documents/GitHub/CSE546-FaceRecognition/test_cases/test_case_1/test_2.mp4')
+	print("Face Recognition done!")
+	context.done(None, "Function executed successfully")

@@ -18,8 +18,7 @@ def downloadVideoFromS3ToLocal(key):
     if not os.path.exists(INPUT_LOCAL_STORAGE_DIR):
         os.makedirs(INPUT_LOCAL_STORAGE_DIR)
     try:
-        fileName = key
-        localPath = os.path.join(INPUT_LOCAL_STORAGE_DIR, fileName)
+        localPath = os.path.join(INPUT_LOCAL_STORAGE_DIR, key)
         s3Client.download_file(
             INPUT_BUCKET_NAME,
             key,
@@ -28,7 +27,7 @@ def downloadVideoFromS3ToLocal(key):
     except Exception as exception:
         print("Exception in downloading file to local", exception)
         return exception
-    return "{}{}".format(localPath, key)
+    return localPath
 
 def addResultObjectToS3(imageName):
     filepath = OUTPUT_FILE_DIRECTORY + '/' + imageName + '.csv'

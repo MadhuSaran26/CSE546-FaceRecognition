@@ -18,4 +18,5 @@ def queryTable(resultName):
         IndexName=INDEX_NAME,
         KeyConditionExpression=Key('name').eq(resultName)
     )
+    print(response['Items'])
     if response['Items'][0]: return response['Items'][0]
