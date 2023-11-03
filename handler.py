@@ -34,9 +34,7 @@ def compare_image_with_embeddings(framePath, encodingData):
 		return faceRecognized, resultName
 	else:
 		frameEncoding = frameEncodings[0]
-		results = []
-		for encoding in encodingData['encoding']:
-			results.append(face_recognition.compare_faces([encoding], frameEncoding))
+		results = face_recognition.compare_faces(encodingData['encoding'], frameEncoding)
 		resultIndex = np.argmax(results)
 		resultName = encodingData['name'][resultIndex]
 		faceRecognized = True
