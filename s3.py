@@ -20,7 +20,6 @@ s3Client = boto3.client(
 )
 
 def downloadVideoFromS3ToLocal(key):
-    print("Hey printing env var", S3_SERVICE)
     if not os.path.exists(INPUT_LOCAL_STORAGE_DIR):
         os.makedirs(INPUT_LOCAL_STORAGE_DIR)
     try:
@@ -37,7 +36,6 @@ def downloadVideoFromS3ToLocal(key):
 
 def addResultObjectToS3(imageName):
     filepath = OUTPUT_FILE_DIRECTORY + '/' + imageName + '.csv'
-    print(filepath)
     try:
         s3Client.upload_file(filepath, OUTPUT_BUCKET_NAME, imageName + '.csv')
     except Exception as exception:
