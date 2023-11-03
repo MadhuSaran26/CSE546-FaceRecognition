@@ -10,6 +10,7 @@ OUTPUT_BUCKET_NAME = os.getenv("OUTPUT_S3_BUCKET_NAME")
 OUTPUT_S3_FILE_LOCATION = os.getenv("S3_LOCATION").format(OUTPUT_BUCKET_NAME)
 INPUT_LOCAL_STORAGE_DIR = os.getenv("INPUT_LOCAL_STORAGE_DIR")
 INPUT_FRAME_STORAGE_DIR = os.getenv("INPUT_FRAME_STORAGE_DIR")
+OUTPUT_FILE_DIRECTORY = os.getenv("OUTPUT_FILE_DIRECTORY")
 
 s3Client = boto3.client(S3_SERVICE)
 
@@ -46,14 +47,11 @@ def downloadVideoFromS3ToLocal(key):
         return exception
     return "{}{}".format(localPath, key)
 
-def addResultObjectToS3(imageName, imageResult): #TODO: Need to edit this to store the output in .csv file format
+def addResultObjectToS3(imageName):
+    filepath = OUTPUT_FILE_DIRECTORY + '/' + imageName + '.csv'
+    print(filepath)
     try:
-        s3Client.put_object(
-            Bucket=OUTPUT_BUCKET_NAME,
-            Key=imageName,
-            Body=imageResult.encode('utf-8'),
-            ContentType='text/plain'
-        )
+        s3Client.upload_file(filepath, OUTPUT_BUCKET_NAME, imageName + '.csv')
     except Exception as exception:
         print("Exception in uploading result from App Instance", exception)
         return exception
