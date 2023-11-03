@@ -8,9 +8,9 @@ load_dotenv()
 DYNAMODB_SERVICE = os.getenv("DYNAMODB_SERVICE")
 TABLE_NAME = os.getenv("TABLE_NAME")
 INDEX_NAME = os.getenv("INDEX_NAME")
-AWS_REGION = os.getenv("AWS_REGION")
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.getenv("REGION")
+AWS_ACCESS_KEY_ID = os.getenv("ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("SECRET_ACCESS_KEY")
 
 dynamodbClient = boto3.resource(
     DYNAMODB_SERVICE,
