@@ -13,7 +13,6 @@ INPUT_FRAME_STORAGE_DIR = os.getenv("INPUT_FRAME_STORAGE_DIR")
 OUTPUT_FILE_DIRECTORY = os.getenv("OUTPUT_FILE_DIRECTORY")
 AWS_ACCESS_KEY_ID = os.getenv("ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("SECRET_ACCESS_KEY")
-
 s3Client = boto3.client(
     S3_SERVICE,
     aws_access_key_id=AWS_ACCESS_KEY_ID,
@@ -21,6 +20,7 @@ s3Client = boto3.client(
 )
 
 def downloadVideoFromS3ToLocal(key):
+    print("Hey printing env var", S3_SERVICE)
     if not os.path.exists(INPUT_LOCAL_STORAGE_DIR):
         os.makedirs(INPUT_LOCAL_STORAGE_DIR)
     try:
